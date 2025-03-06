@@ -1,16 +1,14 @@
+// frontend/lib/main.dart
+
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
+import 'controllers/theme_controller.dart';
+import 'providers/user_provider.dart';
 import 'screens/login_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Supabase - you'll need to replace with your own URL and key
-  await Supabase.initialize(
-    url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY',
-  );
-
+void main() {
   runApp(const MyApp());
 }
 
@@ -19,47 +17,58 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CleanSlate',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: const Color(0xFF9D4EDD),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF9D4EDD),
-          primary: const Color(0xFF9D4EDD),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.grey[100],
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF9D4EDD),
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeController()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: Consumer<ThemeController>(
+        builder: (context, themeController, child) {
+          return MaterialApp(
+            title: 'CleanSlate',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              brightness: Brightness.light,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF5271FF),
+                brightness: Brightness.light,
+              ),
+              useMaterial3: true,
             ),
-          ),
-        ),
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            side: BorderSide(color: Colors.grey[300]!),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF5271FF),
+                brightness: Brightness.dark,
+              ),
+              useMaterial3: true,
             ),
-          ),
-        ),
+            themeMode: themeController.themeMode,
+            home: const AuthWrapper(),
+          );
+        },
       ),
-      home: const LoginScreen(),
     );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+
+    // Show splash screen while checking auth status
+    if (userProvider.isLoading) {
+      return const SplashScreen();
+    }
+
+    // Check if user is authenticated
+    if (userProvider.isAuthenticated) {
+      return const HomeScreen();
+    } else {
+      return const LoginScreen();
+    }
   }
 }

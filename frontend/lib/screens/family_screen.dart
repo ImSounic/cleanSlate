@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'home_screen.dart';
 import 'schedule_screen.dart';
 import 'settings_screen.dart';
+import '../controllers/theme_controller.dart';
 
 class FamilyScreen extends StatefulWidget {
   const FamilyScreen({Key? key}) : super(key: key);
@@ -72,13 +74,14 @@ class _FamilyScreenState extends State<FamilyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Access the theme for dark mode support
+    final themeController = Provider.of<ThemeController>(context);
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FB),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             // Navigate back to home
             Navigator.pushReplacement(
@@ -89,7 +92,9 @@ class _FamilyScreenState extends State<FamilyScreen> {
         ),
         title: const Text(
           'Family Members',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           // Add button
@@ -102,7 +107,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
               icon: const Icon(Icons.add, size: 18),
               label: const Text('Add'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF9D4EDD),
+                backgroundColor: theme.colorScheme.primary,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
@@ -127,14 +132,12 @@ class _FamilyScreenState extends State<FamilyScreen> {
               itemBuilder: (context, index) {
                 final member = _familyMembers[index];
                 return Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
+                    border: Border.all(color: theme.dividerColor),
                   ),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
@@ -152,7 +155,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                     ),
                     title: Text(
                       member['name'],
-                      style: const TextStyle(
+                      style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
@@ -162,16 +165,16 @@ class _FamilyScreenState extends State<FamilyScreen> {
                       children: [
                         Text(
                           member['email'],
-                          style: TextStyle(color: Colors.grey.shade600),
+                          style: theme.textTheme.bodyMedium,
                         ),
                         Text(
                           member['role'],
-                          style: TextStyle(color: Colors.grey.shade600),
+                          style: theme.textTheme.bodyMedium,
                         ),
                       ],
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.grey),
+                      icon: Icon(Icons.edit, color: theme.iconTheme.color),
                       onPressed: () {
                         // Edit family member
                       },
@@ -188,7 +191,9 @@ class _FamilyScreenState extends State<FamilyScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F0FF),
+                color: theme.brightness == Brightness.dark
+                    ? Color(0xFF2D1A3D) // Darker purple for dark mode
+                    : Color(0xFFF5F0FF), // Light purple for light mode
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -196,18 +201,18 @@ class _FamilyScreenState extends State<FamilyScreen> {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'AI',
                         style: TextStyle(
-                          color: Color(0xFF9D4EDD),
+                          color: theme.colorScheme.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Text(
+                      Text(
                         'Chore Distribution',
-                        style: TextStyle(
+                        style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -215,9 +220,9 @@ class _FamilyScreenState extends State<FamilyScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Emma has 5 chores this week while Jack only has 2. Would you like me to suggest a more balanced distribution?',
-                    style: TextStyle(color: Colors.black87),
+                    style: theme.textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -227,7 +232,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                           // Show suggestions
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF9D4EDD),
+                          backgroundColor: theme.colorScheme.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -241,7 +246,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                           // Dismiss suggestion
                         },
                         style: TextButton.styleFrom(
-                          foregroundColor: Colors.black,
+                          foregroundColor: theme.textTheme.bodyLarge?.color,
                         ),
                         child: const Text('Dismiss'),
                       ),
@@ -259,9 +264,12 @@ class _FamilyScreenState extends State<FamilyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Chore Statistics',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
                   const SizedBox(height: 16),
 
@@ -271,11 +279,11 @@ class _FamilyScreenState extends State<FamilyScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 1.5,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
+                      crossAxisCount: 2,
+                      childAspectRatio: 1.5,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
                     itemCount: _familyMembers.length,
                     itemBuilder: (context, index) {
                       final member = _familyMembers[index];
@@ -283,9 +291,9 @@ class _FamilyScreenState extends State<FamilyScreen> {
                       return Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: theme.cardColor,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade200),
+                          border: Border.all(color: theme.dividerColor),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,7 +315,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                                 const SizedBox(width: 8),
                                 Text(
                                   member['name'],
-                                  style: const TextStyle(
+                                  style: theme.textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -318,13 +326,13 @@ class _FamilyScreenState extends State<FamilyScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
+                                Text(
                                   'Completed',
-                                  style: TextStyle(fontSize: 12),
+                                  style: theme.textTheme.bodySmall,
                                 ),
                                 Text(
                                   stats['completed'],
-                                  style: const TextStyle(fontSize: 12),
+                                  style: theme.textTheme.bodySmall,
                                 ),
                               ],
                             ),
@@ -333,9 +341,12 @@ class _FamilyScreenState extends State<FamilyScreen> {
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
                                 value: stats['completedPercent'],
-                                backgroundColor: Colors.grey.shade200,
+                                backgroundColor:
+                                    theme.brightness == Brightness.dark
+                                        ? Colors.grey.shade800
+                                        : Colors.grey.shade200,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  const Color(0xFF9D4EDD),
+                                  theme.colorScheme.primary,
                                 ),
                                 minHeight: 8,
                               ),
@@ -344,13 +355,13 @@ class _FamilyScreenState extends State<FamilyScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
+                                Text(
                                   'On time',
-                                  style: TextStyle(fontSize: 12),
+                                  style: theme.textTheme.bodySmall,
                                 ),
                                 Text(
                                   stats['onTime'],
-                                  style: const TextStyle(fontSize: 12),
+                                  style: theme.textTheme.bodySmall,
                                 ),
                               ],
                             ),
@@ -359,7 +370,10 @@ class _FamilyScreenState extends State<FamilyScreen> {
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
                                 value: stats['onTimePercent'],
-                                backgroundColor: Colors.grey.shade200,
+                                backgroundColor:
+                                    theme.brightness == Brightness.dark
+                                        ? Colors.grey.shade800
+                                        : Colors.grey.shade200,
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   Colors.green,
                                 ),
@@ -383,8 +397,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
       floatingActionButton: Container(
         width: 60,
         height: 60,
-        decoration: const BoxDecoration(
-          color: Color(0xFF9D4EDD),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primary,
           shape: BoxShape.circle,
         ),
         child: IconButton(
@@ -419,15 +433,11 @@ class _FamilyScreenState extends State<FamilyScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const ScheduleScreen(),
-                    ),
+                        builder: (context) => const ScheduleScreen()),
                   );
                 },
-                child: _buildNavBarItem(
-                  Icons.calendar_today,
-                  'Schedule',
-                  false,
-                ),
+                child:
+                    _buildNavBarItem(Icons.calendar_today, 'Schedule', false),
               ),
               const SizedBox(width: 60), // Space for FAB
               // Family - active
@@ -438,8 +448,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const SettingsScreen(),
-                    ),
+                        builder: (context) => const SettingsScreen()),
                   );
                 },
                 child: _buildNavBarItem(Icons.settings, 'Settings', false),
@@ -452,14 +461,19 @@ class _FamilyScreenState extends State<FamilyScreen> {
   }
 
   Widget _buildNavBarItem(IconData icon, String label, bool isActive) {
+    final theme = Theme.of(context);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: isActive ? const Color(0xFF9D4EDD) : Colors.grey),
+        Icon(
+          icon,
+          color: isActive ? theme.colorScheme.primary : Colors.grey,
+        ),
         Text(
           label,
           style: TextStyle(
-            color: isActive ? const Color(0xFF9D4EDD) : Colors.grey,
+            color: isActive ? theme.colorScheme.primary : Colors.grey,
             fontSize: 12,
           ),
         ),
